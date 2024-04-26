@@ -9,6 +9,7 @@ import (
 
 type AppCfg struct {
 	Logger config.Logger `json:"logger" yaml:"logger" env-prefix:"LOGGER_"`
+	S3     config.S3     `json:"s3" yaml:"s3" env-prefix:"S3_"`
 }
 
 var cfg AppCfg
