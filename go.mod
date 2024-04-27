@@ -1,4 +1,4 @@
-module pgprodgostg
+module pgdmpres
 
 go 1.22.2
 

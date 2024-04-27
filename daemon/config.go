@@ -1,7 +1,7 @@
-package app
+package daemon
 
 import (
-	"pgprodgostg/pkg/config"
+	"pgdmpres/pkg/config"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/pkg/errors"
