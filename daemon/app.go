@@ -23,7 +23,6 @@ func Run() {
 
 	// ________________________________________________________________________
 	// Banner
-	
 
 	// ________________________________________________________________________
 	// Setup logger
@@ -53,7 +52,7 @@ func Run() {
 	if !ok {
 		log.Fatal().Msgf("Bucket '%s' does not exists at '%s'", cfg.S3.Bucket, cfg.S3.Endpoint)
 	}
-	log.Info().Msg("Successfully created S3 client")
+	log.Info().Msgf("Successfully connected with S3 client to '%s'", cfg.S3.Endpoint)
 
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
 	// Use a buffered channel to avoid missing signals as recommended for signal.Notify

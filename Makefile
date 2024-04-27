@@ -38,5 +38,8 @@ image_tag = test
 docker.build.app:
 	docker buildx build . -f docker/Dockerfile -t $(app_name):$(image_tag) --load
 
-docker.compose:
+docker.compose.build:
+	docker compose -f docker/docker-compose.yaml build
+docker.compose.up:
 	docker compose -f docker/docker-compose.yaml up
+docker.compose: docker.compose.build docker.compose.up
