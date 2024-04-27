@@ -5,3 +5,7 @@ s3:
   bucket: backup
   accessID: minioadmin
   accessSecret: minioadmin
+dump:
+  enabled: true
+restore:
+  enabled: true

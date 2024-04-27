@@ -4,13 +4,18 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"pgdmpres/pkg/util"
+	"time"
 
+	"github.com/go-co-op/gocron/v2"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
 )
+
+const appName = "PG Dmp & Res"
 
 func Run() {
 	// ________________________________________________________________________
@@ -23,6 +28,7 @@ func Run() {
 
 	// ________________________________________________________________________
 	// Banner
+	util.PrintBanner(appName)
 
 	// ________________________________________________________________________
 	// Setup logger
@@ -54,6 +60,45 @@ func Run() {
 	}
 	log.Info().Msgf("Successfully connected with S3 client to '%s'", cfg.S3.Endpoint)
 
+	// ________________________________________________________________________
+	// Create cron jobs
+	s, err := gocron.NewScheduler()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create cron scheduler")
+	}
+	s.Start()
+	log.Info().Msg("Successfully started cron scheduler")
+	if cfg.Dump.Enabled {
+		job, err := s.NewJob(
+			gocron.DurationJob(4*time.Second),
+			// gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(12, 0, 0))),
+			gocron.NewTask(dmp),
+		)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create dump job")
+		}
+		nr, err := job.NextRun()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to get dump job next run")
+		}
+		log.Info().Str("job_id", job.ID().String()).Msgf("Successfully created dump job. Next run: %s", nr)
+	}
+	if cfg.Restore.Enabled {
+		job, err := s.NewJob(
+			gocron.DurationJob(4*time.Second),
+			// gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(12, 0, 0))),
+			gocron.NewTask(res),
+		)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create restore job")
+		}
+		nr, err := job.NextRun()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to get restore job next run")
+		}
+		log.Info().Str("job_id", job.ID().String()).Msgf("Successfully created restore job. Next run: %s", nr)
+	}
+
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
 	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
 	quit := make(chan os.Signal, 1)
@@ -63,5 +108,8 @@ func Run() {
 	<-quit
 
 	log.Info().Msg("Gracefully shutting down")
+	if err = s.Shutdown(); err != nil {
+		log.Error().Err(err).Msg("Failed to shutdown cron scheduler")
+	}
 	log.Info().Msg("Gracefull shutdown completed")
 }

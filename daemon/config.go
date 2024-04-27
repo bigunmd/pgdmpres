@@ -10,6 +10,14 @@ import (
 type AppCfg struct {
 	Logger config.Logger `json:"logger" yaml:"logger" env-prefix:"LOGGER_"`
 	S3     config.S3     `json:"s3" yaml:"s3" env-prefix:"S3_"`
+	Dump   struct {
+		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"true"`
+		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
+	} `json:"dump" yaml:"dump" env-prefix:"DUMP_"`
+	Restore struct {
+		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"false"`
+		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
+	} `json:"restore" yaml:"restore" env-prefix:"RESTORE_"`
 }
 
 var cfg AppCfg
