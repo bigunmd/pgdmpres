@@ -32,3 +32,11 @@ docker.run.minio:
 		server /data --console-address ":9001"
 docker.stop.minio:
 	docker stop minio
+
+image_tag = test
+
+docker.build.app:
+	docker buildx build . -f docker/Dockerfile -t $(app_name):$(image_tag) --load
+
+docker.compose:
+	docker compose -f docker/docker-compose.yaml up
