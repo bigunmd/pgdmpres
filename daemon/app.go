@@ -36,7 +36,7 @@ func Run() {
 	// ________________________________________________________________________
 	// Create S3 client
 	mc, err := minio.New(cfg.S3.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(cfg.S3.ID, cfg.S3.Secret, cfg.S3.Token),
+		Creds:  credentials.NewStaticV4(cfg.S3.AccessID, cfg.S3.AccessSecret, cfg.S3.Token),
 		Secure: cfg.S3.UseSSL,
 		Region: cfg.S3.Region,
 	})
