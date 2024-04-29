@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"pgdmpres/pkg/util"
-	"time"
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/minio/minio-go/v7"
@@ -69,11 +68,13 @@ func Run() {
 	s.Start()
 	log.Info().Msg("Successfully started cron scheduler")
 	if cfg.Dump.Enabled {
-		job, err := s.NewJob(
-			gocron.DurationJob(4*time.Second),
-			// gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(12, 0, 0))),
-			gocron.NewTask(dmp),
-		)
+		var jd gocron.JobDefinition
+		if cfg.Dump.Crontab != "" {
+			jd = gocron.CronJob(cfg.Dump.Crontab, cfg.Dump.CrontabWithSeconds)
+		} else {
+			jd = gocron.DurationJob(cfg.Dump.Interval)
+		}
+		job, err := s.NewJob(jd, gocron.NewTask(dmp, mc))
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to create dump job")
 		}
@@ -81,14 +82,16 @@ func Run() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to get dump job next run")
 		}
-		log.Info().Str("job_id", job.ID().String()).Msgf("Successfully created dump job. Next run: %s", nr)
+		log.Info().Str("job_id", job.ID().String()).Time("next_run", nr).Msg("Successfully created dump job")
 	}
 	if cfg.Restore.Enabled {
-		job, err := s.NewJob(
-			gocron.DurationJob(4*time.Second),
-			// gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(12, 0, 0))),
-			gocron.NewTask(res),
-		)
+		var jd gocron.JobDefinition
+		if cfg.Restore.Crontab != "" {
+			jd = gocron.CronJob(cfg.Restore.Crontab, cfg.Restore.CrontabWithSeconds)
+		} else {
+			jd = gocron.DurationJob(cfg.Restore.Interval)
+		}
+		job, err := s.NewJob(jd, gocron.NewTask(res, mc))
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to create restore job")
 		}
@@ -96,7 +99,7 @@ func Run() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to get restore job next run")
 		}
-		log.Info().Str("job_id", job.ID().String()).Msgf("Successfully created restore job. Next run: %s", nr)
+		log.Info().Str("job_id", job.ID().String()).Time("next_run", nr).Msg("Successfully created restore job")
 	}
 
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.

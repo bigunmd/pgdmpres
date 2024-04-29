@@ -7,5 +7,7 @@ s3:
   accessSecret: minioadmin
 dump:
   enabled: true
+  interval: 10s
 restore:
   enabled: true
+  interval: 10s

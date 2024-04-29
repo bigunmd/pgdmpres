@@ -2,10 +2,21 @@ package daemon
 
 import (
 	"pgdmpres/pkg/config"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/pkg/errors"
 )
+
+type GPG struct {
+	Passphrase string `json:"passphrase" yaml:"passphrase" env:"PASSPHRASE" env-default:""`
+}
+
+type Cron struct {
+	Interval           time.Duration `json:"interval" yaml:"interval" env:"INTERVAL" env-default:"1h"`
+	Crontab            string        `json:"crontab" yaml:"crontab" env:"CRONTAB" env-default:""`
+	CrontabWithSeconds bool          `json:"crontabWithSeconds" yaml:"crontabWithSeconds" env:"CRONTAB_WITH_SECONDS" env-default:"false"`
+}
 
 type AppCfg struct {
 	Logger config.Logger `json:"logger" yaml:"logger" env-prefix:"LOGGER_"`
@@ -13,10 +24,17 @@ type AppCfg struct {
 	Dump   struct {
 		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"true"`
 		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
+		Cron
+		Timeout time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
+		GPG     `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
+		Rotate  time.Duration `json:"rotate" yaml:"rotate" env:"ROTATE"`
 	} `json:"dump" yaml:"dump" env-prefix:"DUMP_"`
 	Restore struct {
 		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"false"`
 		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
+		Cron
+		Timeout time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
+		GPG     `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
 	} `json:"restore" yaml:"restore" env-prefix:"RESTORE_"`
 }
 

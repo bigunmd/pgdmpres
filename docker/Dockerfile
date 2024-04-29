@@ -30,6 +30,7 @@ RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} \
 FROM ${POSTGRES_IMAGE}
 
 ARG APP_NAME="app"
+RUN apk add gnupg
 COPY --from=builder /bin/${APP_NAME} /app
 
 CMD ["/app"]
