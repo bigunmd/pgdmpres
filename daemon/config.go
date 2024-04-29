@@ -1,8 +1,9 @@
 package daemon
 
 import (
-	"pgdmpres/pkg/config"
 	"time"
+
+	"github.com/bigunmd/pgdmpres/pkg/config"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/pkg/errors"

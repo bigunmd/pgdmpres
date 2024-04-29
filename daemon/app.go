@@ -4,7 +4,8 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"pgdmpres/pkg/util"
+
+	"github.com/bigunmd/pgdmpres/pkg/util"
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/minio/minio-go/v7"

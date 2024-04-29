@@ -2,8 +2,9 @@ package main
 
 import (
 	"os"
-	"pgdmpres/daemon"
 	"time"
+
+	"github.com/bigunmd/pgdmpres/daemon"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
