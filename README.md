@@ -2,4 +2,13 @@
 
 ## Description
 
-This repository is driven by the essential need to migrate production base backups to staging environment in order to mirror them.
+Schedule `pg_dump` and `pg_restore` operations using 1 container with full featured cron daemon written in Go.
+
+## ToC
+
+- [pgdmpres](#pgdmpres)
+  - [Description](#description)
+  - [ToC](#toc)
+  - [Configuration](#configuration)
+
+## Configuration
