@@ -9,7 +9,30 @@ Schedule `pg_dump` and `pg_restore` operations using 1 container with full featu
 - [pgdmpres](#pgdmpres)
   - [Description](#description)
   - [ToC](#toc)
+  - [How to use](#how-to-use)
   - [Configuration](#configuration)
+
+## How to use
+
+Use latest docker image configured by `env`
+
+```bash
+docker run --rm -d \
+  -e S3_ENDPOINT=mys3.cloud \
+  -e S3_BUCKET=backups \
+  -e S3_PREFIX=prod \
+  -e S3_ACCESS_ID=secret \
+  -e S3_ACCESS_SECRET=secret \
+  -e DUMP_POSTGRES_HOST=mypg.prod.cloud \
+  -e DUMP_POSTGRES_USER=secret \
+  -e DUMP_POSTGRES_PASSWORD=secret \
+  -e DUMP_CRONTAB=@weekly \
+  -e DUMP_ROTATE=24h \
+  -e DUMP_GPG_PASSPHRASE=secret \
+  -e RESTORE_ENABLED=true \
+  -e RESTORE_GPG_PASSPHRASE=secret \
+  mbigun/pgdmpres
+```
 
 ## Configuration
 
