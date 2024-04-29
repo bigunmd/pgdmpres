@@ -3,5 +3,11 @@ logger:
 s3:
   endpoint: 127.0.0.1:9000
   bucket: backup
-  id: 3SQzdl74ganK94s0U5x1
-  secret: 7fMIUGpYmtMeTRRRpyYMbzSeMgZmYOhnWm5MYH9t
+  accessID: minioadmin
+  accessSecret: minioadmin
+dump:
+  enabled: true
+  interval: 10s
+restore:
+  enabled: true
+  interval: 10s
