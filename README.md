@@ -2,6 +2,8 @@
 
 ## Description
 
+![Usecase architecture](arch.png)
+
 Schedule `pg_dump` and `pg_restore` operations using 1 container with full featured cron daemon written in Go.
 
 ## ToC
