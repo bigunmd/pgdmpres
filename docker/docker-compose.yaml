@@ -15,6 +15,7 @@ services:
       - DUMP_ENABLED=true
       - DUMP_POSTGRES_HOST=postgres
       - DUMP_INTERVAL=4s
+      # - DUMP_CRONTAB=@weekly
       - DUMP_GPG_PASSPHRASE=secret
       - DUMP_ROTATE=8s
       - RESTORE_ENABLED=true
@@ -63,7 +64,5 @@ services:
       - intranet
     volumes:
       - ~/postgres/data:/var/lib/postgresql/data
-      - ./initdb:/docker-entrypoint-initdb.d
-
 networks:
   intranet:
