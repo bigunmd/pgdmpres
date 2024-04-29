@@ -24,11 +24,6 @@ const (
 	resFilepathDecrypted = tmpPath + "/" + resFilenameDecrypted
 )
 
-// const tmpFilepath = "/tmp/" + tmpFilename
-// const tmpFilepathEncrypted = "/tmp/" + tmpFilenameEncrypted
-// const tmpFilepathRestore = "/tmp/res"
-// const tmpFilepathRestoreDecrypted = "/tmp/res.dec"
-
 const (
 	cmdPgDump    = "pg_dump"
 	cmdPgRestore = "pg_restore"
@@ -37,13 +32,10 @@ const (
 	argNoPassword = "--no-password"
 	argVerbose    = "--verbose"
 	argFormat     = "--format=t"
-	// argFile       = "--file=" + tmpFilepath
 
 	argSymmetric = "--symmetric"
 	argBatch     = "--batch"
 	argDecrypt   = "--decrypt"
-	// argOutputEncrypted = "--output=" + tmpFilepathEncrypted
-	// argOutputDecrypted = "--output=" + tmpFilepathRestoreDecrypted
 )
 
 type pgDumpStd struct{}
