@@ -1,5 +1,12 @@
 # pgdmpres
 
+![Release](https://img.shields.io/github/release/bigunmd/pgdmpres.svg)
+![Issues](https://img.shields.io/github/issues/bigunmd/pgdmpres.svg)
+
+![License](https://img.shields.io/github/license/bigunmd/pgdmpres.svg)
+![Made with Go](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)
+![Postgresql](https://img.shields.io/badge/PostgreSQL-316192)
+
 ## Description
 
 ![Usecase architecture](arch.png)
