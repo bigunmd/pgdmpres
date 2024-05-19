@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -14,12 +16,12 @@ import (
 
 const (
 	tmpPath              = "/tmp"
-	dmpFilename          = "dmp.tar"
-	dmpFilenameEncrypted = "dmp.tar.gpg"
+	dmpFilename          = "dmp.dump"
+	dmpFilenameEncrypted = "dmp.dump.gpg"
 	dmpFilepath          = tmpPath + "/" + dmpFilename
 	dmpFilepathEncrypted = tmpPath + "/" + dmpFilenameEncrypted
-	resFilename          = "res.tar"
-	resFilenameDecrypted = "decrypted_res.tar"
+	resFilename          = "res.dump"
+	resFilenameDecrypted = "decrypted_res.dump"
 	resFilepath          = tmpPath + "/" + resFilename
 	resFilepathDecrypted = tmpPath + "/" + resFilenameDecrypted
 )
@@ -31,12 +33,39 @@ const (
 
 	argNoPassword = "--no-password"
 	argVerbose    = "--verbose"
-	argFormat     = "--format=t"
+	argFormat     = "--format=c"
 
 	argSymmetric = "--symmetric"
 	argBatch     = "--batch"
 	argDecrypt   = "--decrypt"
 )
+
+var reservedArgs []string = []string{
+	"-f", "--file",
+	"-F", "--format",
+	"-v", "--verbose",
+	"-V", "--version",
+	"-?", "--help",
+	"-d", "--dbname",
+	"-h", "--host",
+	"-p", "--port",
+	"-U", "--username",
+	"-w", "--no-password",
+	"-W", "--password",
+	"-l", "--list",
+}
+
+func filterArgs(args []string) []string {
+	return slices.DeleteFunc(args, func(arg string) bool {
+		for _, v := range reservedArgs {
+			if strings.Contains(arg, v) {
+				log.Debug().Str("arg", arg).Msg("Ommited argument")
+				return true
+			}
+		}
+		return false
+	})
+}
 
 type pgDumpStd struct{}
 
@@ -68,9 +97,7 @@ func dmp(mc *minio.Client) {
 		Msg("Creating backup file")
 	ctx, cancel := context.WithTimeout(context.TODO(), cfg.Dump.Timeout)
 	defer cancel()
-	cmd := exec.CommandContext(
-		ctx,
-		cmdPgDump,
+	args := []string{
 		fmt.Sprintf("--host=%s", cfg.Dump.Postgres.Host),
 		fmt.Sprintf("--port=%v", cfg.Dump.Postgres.Port),
 		fmt.Sprintf("--dbname=%s", cfg.Dump.Postgres.DB),
@@ -79,6 +106,12 @@ func dmp(mc *minio.Client) {
 		argFormat,
 		fmt.Sprintf("--file=%s", dmpFilepath),
 		argVerbose,
+	}
+	args = append(args, cfg.Dump.ExtraArgs...)
+	cmd := exec.CommandContext(
+		ctx,
+		cmdPgDump,
+		args...,
 	)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PGPASSWORD=%s", cfg.Dump.Postgres.Password))
 	cmd.Stderr = &pgDumpStd{}
@@ -227,9 +260,7 @@ func res(mc *minio.Client) {
 		Str("addr", cfg.Restore.Postgres.Addr()).
 		Str("db", cfg.Restore.Postgres.DB).
 		Msg("Restoring database from backup file")
-	cmd := exec.CommandContext(
-		ctx,
-		cmdPgRestore,
+	args := []string{
 		fmt.Sprintf("--host=%s", cfg.Dump.Postgres.Host),
 		fmt.Sprintf("--port=%v", cfg.Dump.Postgres.Port),
 		fmt.Sprintf("--dbname=%s", cfg.Dump.Postgres.DB),
@@ -238,6 +269,12 @@ func res(mc *minio.Client) {
 		argFormat,
 		argVerbose,
 		bkpFilepath,
+	}
+	args = append(args, cfg.Restore.ExtraArgs...)
+	cmd := exec.CommandContext(
+		ctx,
+		cmdPgRestore,
+		args...,
 	)
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PGPASSWORD=%s", cfg.Restore.Postgres.Password))
 	cmd.Stderr = &pgRestoreStd{}

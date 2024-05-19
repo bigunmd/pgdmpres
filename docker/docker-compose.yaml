@@ -18,9 +18,11 @@ services:
       # - DUMP_CRONTAB=@weekly
       - DUMP_GPG_PASSPHRASE=secret
       - DUMP_ROTATE=8s
+      - DUMP_EXTRA_ARGS=--verbose, -Ft, -v, --no-password
       - RESTORE_ENABLED=true
       - RESTORE_INTERVAL=4s
       - RESTORE_GPG_PASSPHRASE=secret
+      - RESTORE_EXTRA_ARGS=--verbose, -Ft, -v, --no-password
     networks:
       - intranet
     depends_on:

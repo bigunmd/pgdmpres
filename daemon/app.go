@@ -69,6 +69,7 @@ func Run() {
 	s.Start()
 	log.Info().Msg("Successfully started cron scheduler")
 	if cfg.Dump.Enabled {
+		cfg.Dump.ExtraArgs = filterArgs(cfg.Dump.ExtraArgs)
 		var jd gocron.JobDefinition
 		if cfg.Dump.Crontab != "" {
 			jd = gocron.CronJob(cfg.Dump.Crontab, cfg.Dump.CrontabWithSeconds)

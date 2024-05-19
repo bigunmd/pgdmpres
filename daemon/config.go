@@ -26,16 +26,18 @@ type AppCfg struct {
 		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"true"`
 		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
 		Cron
-		Timeout time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
-		GPG     `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
-		Rotate  time.Duration `json:"rotate" yaml:"rotate" env:"ROTATE"`
+		Timeout   time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
+		GPG       `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
+		Rotate    time.Duration `json:"rotate" yaml:"rotate" env:"ROTATE"`
+		ExtraArgs []string      `json:"extraArgs" yaml:"extraArgs" env:"EXTRA_ARGS" env-default:""`
 	} `json:"dump" yaml:"dump" env-prefix:"DUMP_"`
 	Restore struct {
 		Enabled  bool            `json:"enabled" yaml:"enabled" env:"ENABLED" env-default:"false"`
 		Postgres config.Postgres `json:"postgres" yaml:"postgres" env-prefix:"POSTGRES_"`
 		Cron
-		Timeout time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
-		GPG     `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
+		Timeout   time.Duration `json:"timeout" yaml:"timeout" env:"TIMEOUT" env-default:"4s"`
+		GPG       `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
+		ExtraArgs []string `json:"extraArgs" yaml:"extraArgs" env:"EXTRA_ARGS" env-default:""`
 	} `json:"restore" yaml:"restore" env-prefix:"RESTORE_"`
 }
 

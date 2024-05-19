@@ -36,6 +36,28 @@ docker run --rm -d \
   mbigun/pgdmpres
 ```
 
+To further more configure commands execution provide `comma separated list` of arguments through `DUMP_EXTRA_ARGS` and `RESTORE_EXTRA_ARGS` commands.
+> NOTE: Reserved arguments will be ommited!
+>
+> List of reserved arguments:
+>
+> ```golang
+> var reservedArgs []string = []string{
+>  "-f", "--file",
+>  "-F", "--format",
+>  "-v", "--verbose",
+>  "-V", "--version",
+>  "-?", "--help",
+>  "-d", "--dbname",
+>  "-h", "--host",
+>  "-p", "--port",
+>  "-U", "--username",
+>  "-w", "--no-password",
+>  "-W", "--password",
+>  "-l", "--list",
+> }
+> ```
+
 ## Configuration
 
 | Environment variable           | Default value      | Description                                                                                         |
@@ -62,6 +84,7 @@ docker run --rm -d \
 | `DUMP_TIMEOUT`                 | `"4s"`             | Execute `pg_dump` command with that timeout                                                         |
 | `DUMP_GPG_PASSPHRASE`          | `""`               | If set, encrypts backup file with `gpg` using that passphrase                                       |
 | `DUMP_ROTATE`                  | `""`               | If set, rotates existing backups in S3 bucket/prefix. Must be a valid duration string (eg. `"24h"`) |
+| `DUMP_EXTRA_ARGS`              | `""`               | If set, adds extra arguments to `pg_dump` command (reserved arguments will be ommited)              |
 | `RESTORE_ENABLED`              | `false`            | Enable `pg_restore` command job                                                                     |
 | `RESTORE_POSTGRES_HOST`        | `"127.0.0.1"`      | Postgres connection host for `pg_restore` command                                                   |
 | `RESTORE_POSTGRES_PORT`        | `5432`             | Postgres connection port for `pg_restore` command                                                   |
@@ -73,3 +96,4 @@ docker run --rm -d \
 | `RESTORE_CRONTAB_WITH_SECONDS` | `false`            | If set as `true`, respects seconds mark in `RESTORE_CRONTAB`                                        |
 | `RESTORE_TIMEOUT`              | `"4s"`             | Execute `pg_restore` command with that timeout                                                      |
 | `RESTORE_GPG_PASSPHRASE`       | `""`               | If set, decrypts backup file with `gpg` using that passphrase                                       |
+| `RESTORE_EXTRA_ARGS`           | `""`               | If set, adds extra arguments to `pg_restore` command (reserved arguments will be ommited)           |
