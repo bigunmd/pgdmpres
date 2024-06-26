@@ -65,6 +65,11 @@ To further more configure commands execution provide `comma separated list` of a
 > }
 > ```
 
+> NOTE: To avoid `OOMKilled` in Kubernetes cluster or just to reduce memory footprint of `pg_dump`
+> use compress flags, for example:
+> 
+> `DUMP_EXTRA_ARGS="-Z 9"`
+
 ## Configuration
 
 | Environment variable           | Default value      | Description                                                                                         |
