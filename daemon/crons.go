@@ -18,13 +18,25 @@ const (
 	tmpPath              = "/tmp"
 	dmpFilename          = "dmp.dump"
 	dmpFilenameEncrypted = "dmp.dump.gpg"
-	dmpFilepath          = tmpPath + "/" + dmpFilename
-	dmpFilepathEncrypted = tmpPath + "/" + dmpFilenameEncrypted
 	resFilename          = "res.dump"
 	resFilenameDecrypted = "decrypted_res.dump"
-	resFilepath          = tmpPath + "/" + resFilename
-	resFilepathDecrypted = tmpPath + "/" + resFilenameDecrypted
 )
+
+func dmpFilepath() string {
+	return cfg.DataPath + "/" + dmpFilename
+}
+
+func dmpFilepathEncrypted() string {
+	return cfg.DataPath + "/" + dmpFilenameEncrypted
+}
+
+func resFilepath() string {
+	return cfg.DataPath + "/" + resFilename
+}
+
+func resFilepathDecrypted() string {
+	return cfg.DataPath + "/" + resFilenameDecrypted
+}
 
 const (
 	cmdPgDump    = "pg_dump"
@@ -104,7 +116,7 @@ func dmp(mc *minio.Client) {
 		fmt.Sprintf("--username=%s", cfg.Dump.Postgres.User),
 		argNoPassword,
 		argFormat,
-		fmt.Sprintf("--file=%s", dmpFilepath),
+		fmt.Sprintf("--file=%s", dmpFilepath()),
 		argVerbose,
 	}
 	args = append(args, cfg.Dump.ExtraArgs...)
@@ -133,7 +145,7 @@ func dmp(mc *minio.Client) {
 	}
 	if cfg.Dump.GPG.Passphrase != "" {
 		dmpLog.Info().Msg("Encrypting backup file")
-		if err := deleteFile(dmpFilepathEncrypted); err != nil {
+		if err := deleteFile(dmpFilepathEncrypted()); err != nil {
 			return
 		}
 		cmd = exec.CommandContext(
@@ -142,9 +154,9 @@ func dmp(mc *minio.Client) {
 			argSymmetric,
 			argBatch,
 			fmt.Sprintf("--passphrase=%s", cfg.Dump.GPG.Passphrase),
-			fmt.Sprintf("--output=%s", dmpFilepathEncrypted),
+			fmt.Sprintf("--output=%s", dmpFilepathEncrypted()),
 			argVerbose,
-			dmpFilepath,
+			dmpFilepath(),
 		)
 		cmd.Stderr = &gpgStd{}
 		cmd.Stdout = &gpgStd{}
@@ -152,24 +164,24 @@ func dmp(mc *minio.Client) {
 			dmpLog.Error().Err(err).Msgf("Failed to run '%s' command", cmdGPG)
 			return
 		}
-		if err := deleteFile(dmpFilepath); err != nil {
+		if err := deleteFile(dmpFilepath()); err != nil {
 			return
 		}
 		dmpLog.Info().Msg("Successfully encrypted backup file")
-		f, err = os.Open(dmpFilepathEncrypted)
+		f, err = os.Open(dmpFilepathEncrypted())
 		if err != nil {
 			dmpLog.Error().Err(err).Msg("Failed to open encrypted backup file")
 			return
 		}
-		defer deleteFile(dmpFilepathEncrypted)
+		defer deleteFile(dmpFilepathEncrypted())
 		objectName = objectName + ".gpg"
 	} else {
-		f, err = os.Open(dmpFilepath)
+		f, err = os.Open(dmpFilepath())
 		if err != nil {
 			dmpLog.Error().Err(err).Msg("Failed to open backup file")
 			return
 		}
-		defer deleteFile(dmpFilepath)
+		defer deleteFile(dmpFilepath())
 	}
 	defer f.Close()
 
@@ -218,14 +230,18 @@ func res(mc *minio.Client) {
 	}) {
 		objects = append(objects, object)
 	}
+	if len(objects) == 0 {
+		resLog.Info().Msg("No backup files found on S3, skipping restore")
+		return
+	}
 	sort.Slice(objects, func(i, j int) bool {
 		return objects[i].LastModified.After(objects[j].LastModified)
 	})
-	if err := mc.FGetObject(ctx, cfg.S3.Bucket, objects[0].Key, resFilepath, minio.GetObjectOptions{}); err != nil {
+	if err := mc.FGetObject(ctx, cfg.S3.Bucket, objects[0].Key, resFilepath(), minio.GetObjectOptions{}); err != nil {
 		resLog.Error().Err(err).Msgf("Failed to get latest backup file from S3")
 		return
 	}
-	defer deleteFile(resFilepath)
+	defer deleteFile(resFilepath())
 	resLog.Info().Str("key", objects[0].Key).Msg("Successfully downloaded latest backup file from S3")
 
 	ctx, cancel = context.WithTimeout(ctx, cfg.Restore.Timeout)
@@ -239,9 +255,9 @@ func res(mc *minio.Client) {
 			argDecrypt,
 			argBatch,
 			fmt.Sprintf("--passphrase=%s", cfg.Dump.GPG.Passphrase),
-			fmt.Sprintf("--output=%s", resFilepathDecrypted),
+			fmt.Sprintf("--output=%s", resFilepathDecrypted()),
 			argVerbose,
-			resFilepath,
+			resFilepath(),
 		)
 		cmd.Stderr = &gpgStd{}
 		cmd.Stdout = &gpgStd{}
@@ -249,11 +265,11 @@ func res(mc *minio.Client) {
 			resLog.Error().Err(err).Msgf("Failed to run '%s' command", cmdGPG)
 			return
 		}
-		defer deleteFile(resFilepathDecrypted)
+		defer deleteFile(resFilepathDecrypted())
 		resLog.Info().Msg("Successfully decrypted backup file")
-		bkpFilepath = resFilepathDecrypted
+		bkpFilepath = resFilepathDecrypted()
 	} else {
-		bkpFilepath = resFilepath
+		bkpFilepath = resFilepath()
 	}
 
 	resLog.Info().

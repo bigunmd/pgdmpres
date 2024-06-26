@@ -39,6 +39,7 @@ type AppCfg struct {
 		GPG       `json:"gpg" yaml:"gpg" env-prefix:"GPG_"`
 		ExtraArgs []string `json:"extraArgs" yaml:"extraArgs" env:"EXTRA_ARGS" env-default:""`
 	} `json:"restore" yaml:"restore" env-prefix:"RESTORE_"`
+	DataPath string `json:"dataPath" yaml:"dataPath" env:"DATA_PATH" env-default:"/tmp"`
 }
 
 var cfg AppCfg

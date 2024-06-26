@@ -104,3 +104,4 @@ To further more configure commands execution provide `comma separated list` of a
 | `RESTORE_TIMEOUT`              | `"4s"`             | Execute `pg_restore` command with that timeout                                                      |
 | `RESTORE_GPG_PASSPHRASE`       | `""`               | If set, decrypts backup file with `gpg` using that passphrase                                       |
 | `RESTORE_EXTRA_ARGS`           | `""`               | If set, adds extra arguments to `pg_restore` command (reserved arguments will be ommited)           |
+| `DATA_PATH`                    | `"/tmp"`           | Where to store working temporary working data                                                       |

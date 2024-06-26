@@ -87,6 +87,7 @@ func Run() {
 		log.Info().Str("job_id", job.ID().String()).Time("next_run", nr).Msg("Successfully created dump job")
 	}
 	if cfg.Restore.Enabled {
+		cfg.Restore.ExtraArgs = filterArgs(cfg.Restore.ExtraArgs)
 		var jd gocron.JobDefinition
 		if cfg.Restore.Crontab != "" {
 			jd = gocron.CronJob(cfg.Restore.Crontab, cfg.Restore.CrontabWithSeconds)
